@@ -27,7 +27,7 @@
     <el-table-column fixed="right" label="操作" width="120">
       <template #default="scope">
         <el-button link type="primary" size="small" @click="handleRowDel(scope.row)" style="color: #F56C6C">删除</el-button>
-        <el-button link type="primary" size="small">编辑</el-button>
+        <el-button link type="primary" size="small" @click="handleEdit(scope.row)">编辑</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -105,6 +105,7 @@ import { ref } from 'vue';
   let multipleSelection = ref<string[]>([])
   let dialogFormVisible = ref(false)
   let tableForm = ref({
+    id:"99",
     name: "张三",
     email: "123@qq.com",
     phone: "13088888888",
@@ -114,6 +115,13 @@ import { ref } from 'vue';
   let dialogType = ref("add")
 
   //方法
+  //编辑
+  const handleEdit = (row) => {
+    dialogFormVisible.value = true
+    dialogType.value = "edit"
+    tableForm.value = row
+  }
+
   //删除一条
   const handleRowDel = ({id}) => {
     //1. 通过id获取对应条目的索引值
@@ -136,14 +144,14 @@ import { ref } from 'vue';
       val.forEach(item => {
         multipleSelection.value.push(item.id) // 将选中数据的编号添加到multipleSelection数组中
       })
-      console.log(multipleSelection.value);
-      
     }
 
   //新增
   const handleAdd = () => {
+    dialogType.value = "add"
     dialogFormVisible.value = true
     tableForm.value = {
+      id:"",
       name: "",
       email: "",
       phone: "",
@@ -154,12 +162,21 @@ import { ref } from 'vue';
 
   //确认
   const dialogConfirm = () => {
+    //判断是新增还是编辑
+    if(dialogType.value === "add") {
     //第一步拿到数据  
     //第二步添加到tableData
     tableData.value.push({
-      id: (tableData.value.length + 1).toString(),
-      ...tableForm.value
+      ...tableForm.value,
+      id: (tableData.value.length + 1).toString(), 
     })
+    } else {
+      //1.获取当前这条的索引
+       let index = tableData.value.findIndex(item => item.id === tableForm.value.id)
+       console.log(index);
+       tableData.value[index] = tableForm.value;
+      //2.替换当前索引值对应的数据
+    }
     //第三步关闭弹窗
     dialogFormVisible.value = false
   }
