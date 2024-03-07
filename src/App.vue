@@ -6,7 +6,7 @@
   </div>
   <!-- query -->
   <div class="query-box">
-    <el-input class="query-input" v-model="queryInput" placeholder="请输入姓名搜索" />
+    <el-input class="query-input" v-model="queryInput" placeholder="请输入姓名搜索" @input="handleQueryName"/>
     <div class="btn-list">
       <el-button type="primary" @click="handleAdd">增加</el-button>
       <el-button type="danger" @click="handleDelList" v-if="multipleSelection.length>0">删除多选</el-button>
@@ -102,6 +102,7 @@ import { ref } from 'vue';
   },
   
   ])
+  let tableDataCopy = Object.assign([],tableData.value)
   let multipleSelection = ref<string[]>([])
   let dialogFormVisible = ref(false)
   let tableForm = ref({
@@ -115,6 +116,16 @@ import { ref } from 'vue';
   let dialogType = ref("add")
 
   //方法
+
+  //搜索
+  const handleQueryName = (val) => {
+    // console.log(val);
+    if(val.length > 0){
+      tableData.value = tableData.value.filter(item => item.name.match(val))
+    } else { 
+      tableData.value = tableDataCopy
+    }
+  }
   //编辑
   const handleEdit = (row) => {
     dialogFormVisible.value = true
