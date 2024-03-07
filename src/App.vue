@@ -22,8 +22,8 @@
     <el-table-column prop="state" label="状态" width="120" />
     <el-table-column prop="address" label="地址" width="300" />
     <el-table-column fixed="right" label="操作" width="120">
-      <template #default>
-        <el-button link type="primary" size="small" @click="handleRowClick" style="color: #F56C6C">删除</el-button>
+      <template #default="scope">
+        <el-button link type="primary" size="small" @click="handleRowDel(scope.row)" style="color: #F56C6C">删除</el-button>
         <el-button link type="primary" size="small">编辑</el-button>
       </template>
     </el-table-column>
@@ -110,11 +110,14 @@ import { ref } from 'vue';
   })
   let dialogType = ref("add")
   //方法
-  const handleRowClick = () => {
-    console.log("handleRowClick")
+  const handleRowDel = ({id}) => {
+    //1. 通过id获取对应条目的索引值
+    let index = tableData.value.findIndex(item => item.id === id)
+    //2. 通过索引值删除对应条目
+    tableData.value.splice(index, 1)
   }
 
-  const handleSelectionChange = (val) => {
+  const handleSelectionChange = (val:any) => {
     multipleSelection.value = val
     
   }
