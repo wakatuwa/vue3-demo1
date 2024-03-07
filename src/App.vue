@@ -7,7 +7,10 @@
   <!-- query -->
   <div class="query-box">
     <el-input class="query-input" v-model="queryInput" placeholder="请输入姓名搜索" />
-    <el-button type="primary" @click="handleAdd">增加</el-button>
+    <div class="btn-list">
+      <el-button type="primary" @click="handleAdd">增加</el-button>
+      <el-button type="danger" @click="handleDelList" v-if="multipleSelection.length>0">删除多选</el-button>
+    </div>
   </div>
   <!-- table -->
   <el-table 
@@ -67,7 +70,7 @@ import { ref } from 'vue';
   let tableData = ref([
   { 
     id:"1",    
-    name: 'Tom',
+    name: 'Tom1',
     email: '123@qq.com',
     phone: '13088888888',
     state: 'California',
@@ -75,7 +78,7 @@ import { ref } from 'vue';
   },
   { 
     id:"2",    
-    name: 'Tom',
+    name: 'Tom2',
     email: '123@qq.com',
     phone: '13088888888',
     state: 'California',
@@ -83,7 +86,7 @@ import { ref } from 'vue';
   },
   { 
     id:"3",    
-    name: 'Tom',
+    name: 'Tom3',
     email: '123@qq.com',
     phone: '13088888888',
     state: 'California',
@@ -91,7 +94,7 @@ import { ref } from 'vue';
   },
   { 
     id:"4",    
-    name: 'Tom',
+    name: 'Tom4',
     email: '123@qq.com',
     phone: '13088888888',
     state: 'California',
@@ -99,7 +102,7 @@ import { ref } from 'vue';
   },
   
   ])
-  let multipleSelection = ref([])
+  let multipleSelection = ref<string[]>([])
   let dialogFormVisible = ref(false)
   let tableForm = ref({
     name: "张三",
@@ -109,19 +112,35 @@ import { ref } from 'vue';
     address: "广东省"
   })
   let dialogType = ref("add")
+
   //方法
+  //删除一条
   const handleRowDel = ({id}) => {
     //1. 通过id获取对应条目的索引值
     let index = tableData.value.findIndex(item => item.id === id)
     //2. 通过索引值删除对应条目
     tableData.value.splice(index, 1)
   }
-
-  const handleSelectionChange = (val:any) => {
-    multipleSelection.value = val
-    
+  
+  const handleDelList = () => {
+    //1. 通过id获取对应条目的索引值,循环调用handleRowDel
+    multipleSelection.value.forEach(id => {
+      handleRowDel({id})
+    })
+    multipleSelection.value = [] // 清空之前的选中数据
   }
 
+  //选中
+    const handleSelectionChange = (val: typeof tableData.value) => {
+      multipleSelection.value = [] // 清空之前的选中数据
+      val.forEach(item => {
+        multipleSelection.value.push(item.id) // 将选中数据的编号添加到multipleSelection数组中
+      })
+      console.log(multipleSelection.value);
+      
+    }
+
+  //新增
   const handleAdd = () => {
     dialogFormVisible.value = true
     tableForm.value = {
@@ -133,15 +152,14 @@ import { ref } from 'vue';
     }
   }
 
+  //确认
   const dialogConfirm = () => {
-    //第一步拿到数据 
-    
+    //第一步拿到数据  
     //第二步添加到tableData
     tableData.value.push({
       id: (tableData.value.length + 1).toString(),
       ...tableForm.value
     })
-
     //第三步关闭弹窗
     dialogFormVisible.value = false
   }
